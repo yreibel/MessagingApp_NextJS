@@ -1,10 +1,12 @@
-import Image from 'next/image'
+import Image from 'next/image';
+
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-      <div>
-          test
-      </div>
-
-  )
+    redirect('/login');
+    return (
+        <div>
+            <div>test</div>
+        </div>
+    );
 }
