@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 import React, { FormEvent } from 'react';
 
-export type SubmitEvent = FormEvent<HTMLFormElement>;
+//export type SubmitEvent = FormEvent<HTMLFormElement>;
 
 import { returnMessage } from '@/utils/_server_actions';
 
@@ -18,14 +18,14 @@ import { returnMessage } from '@/utils/_server_actions';
 }*/
 
 export default function RegistrationForm() {
-    const handleSubmit = async (e: SubmitEvent) => {
+    async function handleSubmit(e: FormData) {
         const t = await returnMessage();
 
         console.log(t);
-    };
+    }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form action={handleSubmit}>
             <Input type="nickname" placeholder="Nickname" />
             <Input type="email" placeholder="Email" />
             <Input type="number" placeholder="Phone number" />

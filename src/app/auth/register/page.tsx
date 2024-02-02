@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 import RegistrationForm from '@/components/RegistrationForm';
 
-import { SubmitEvent } from '@/components/RegistrationForm';
+//import { SubmitEvent } from '@/components/RegistrationForm';
 
 export default function RegisterPage() {
     return (
