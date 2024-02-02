@@ -16,23 +16,14 @@ import { useFormStatus } from 'react-dom';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { Loader2 } from 'lucide-react';
+
 //export type SubmitEvent = FormEvent<HTMLFormElement>;
 
+import { FormState } from '@/utils/_server_actions';
 import { returnMessage } from '@/utils/_server_actions';
 
-const schema = z.object({
-    nickname: z
-        .string({ required_error: 'Nickname is required' })
-        .min(1, { message: 'You must enter a nickname' }),
-    email: z.string().email(),
-    phone_number: z
-        .string()
-        .min(1, { message: 'You must enter a phone number' }),
-    password: z
-        .string({ required_error: 'Password is required' })
-        .min(1, { message: 'You must enter a password' })
-        .min(8, { message: 'The password is too short' }),
-});
+import { registrationFormSchema as schema } from '@/utils/_validation';
 
 type FormValues = z.infer<typeof schema>;
 
@@ -42,20 +33,24 @@ export function RegistrationForm() {
         formState: { isValid, errors },
         handleSubmit,
         setFocus,
-    } = useForm<FormValues>({ resolver: zodResolver(schema), mode: 'onBlur' });
+    } = useForm<FormValues>({ resolver: zodResolver(schema), mode: 'all' });
 
-    //const [formState, formAction] = useFormState(returnMessage, null);
+    const [formState, formAction] = useFormState(returnMessage, {
+        success: false,
+        message: 'lll',
+    });
 
-    const onBlur = (data: FormValues) => {
+    /*const onBlur = (data: FormValues) => {
         console.log(data);
-    };
+    };*/
 
     return (
-        <form onSubmit={handleSubmit(onBlur)}>
+        <form action={formAction}>
             <RegistrationFormContent
                 register={register}
                 isValid={isValid}
                 errors={errors}
+                formState={formState}
             ></RegistrationFormContent>
         </form>
     );
@@ -65,13 +60,17 @@ export function RegistrationFormContent({
     register,
     isValid,
     errors,
+    formState,
 }: {
     register: UseFormRegister<FormValues>;
     isValid: boolean;
     errors: FieldErrors<FormValues>;
+    formState: FormState;
 }) {
+    const { pending } = useFormStatus();
+
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
                 <div className="text-sm">Nickname</div>
                 <Input
@@ -120,20 +119,24 @@ export function RegistrationFormContent({
                     <div className="text-xs">{errors.password.message}</div>
                 )}
             </div>
+            <div>
+                {!isValid && (
+                    <Button type="submit" disabled={true}>
+                        Register
+                    </Button>
+                )}
 
-            <Button type="submit">Register</Button>
+                {isValid && !pending && <Button type="submit">Register</Button>}
+
+                {pending && (
+                    <Button disabled>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Please wait
+                    </Button>
+                )}
+            </div>
+
+            <div>{formState.message}</div>
         </div>
     );
 }
-
-/*
-
-{!isValid && (
-                <Button type="submit" disabled={true}>
-                    Register
-                </Button>
-            )}
-
-            {isValid && <Button type="submit">Register</Button>}
-
-            */
