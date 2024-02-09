@@ -15,10 +15,10 @@ export async function POST(req: Request) {
     }
 
     const newUser = {
-        first_name: user_json.first_name,
-        last_name: user_json.last_name,
+        nickname: user_json.nickname,
         phone_number: user_json.phone_number,
         email: user_json.email,
+        password: user_json.password,
         messages: [],
     };
 

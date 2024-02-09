@@ -21,7 +21,7 @@ import { Loader2 } from 'lucide-react';
 //export type SubmitEvent = FormEvent<HTMLFormElement>;
 
 import { FormState } from '@/utils/_server_actions';
-import { returnMessage } from '@/utils/_server_actions';
+import { registerUser } from '@/utils/_server_actions';
 
 import { registrationFormSchema as schema } from '@/utils/_validation';
 
@@ -35,9 +35,9 @@ export function RegistrationForm() {
         setFocus,
     } = useForm<FormValues>({ resolver: zodResolver(schema), mode: 'all' });
 
-    const [formState, formAction] = useFormState(returnMessage, {
+    const [formState, formAction] = useFormState(registerUser, {
         success: false,
-        message: 'lll',
+        user: { nickname: '', email: '' },
     });
 
     /*const onBlur = (data: FormValues) => {
@@ -136,7 +136,8 @@ export function RegistrationFormContent({
                 )}
             </div>
 
-            <div>{formState.message}</div>
+            <div>{formState.user?.email}</div>
+            <div>{formState.user?.nickname}</div>
         </div>
     );
 }
