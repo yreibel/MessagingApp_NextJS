@@ -7,6 +7,10 @@ import { DisplayableUser, DisplayableUserLogin } from '@/utils/types';
 
 import bcrypt from 'bcrypt';
 
+import { connectMongo } from '@/utils/connectMongo';
+
+import User from '@/models/UserModel';
+
 export type FormState = {
     user?: DisplayableUser | null;
     success: boolean;
@@ -46,26 +50,59 @@ export async function registerUser(
 
     const user = await decodeForm(formData, registrationFormSchema);
 
-    const parsedUser = registrationFormSchema.parse(user);
+    const parsedUser = registrationFormSchema.safeParse(user);
 
-    const { nickname, email, phone_number, password } = parsedUser;
+    if (!parsedUser.success) {
+        // handle error then return
+        return {
+            success: false,
+        };
+    } else {
+        const { nickname, email, phone_number, password } = parsedUser.data;
+        console.log(email);
 
-    console.log(email);
-    if (
-        email !== null &&
-        nickname !== null &&
-        phone_number !== null &&
-        password !== null
-    ) {
+        if (
+            email === null ||
+            nickname === null ||
+            phone_number === null ||
+            password === null
+        ) {
+            return {
+                success: false,
+            };
+        }
+
+        // Do sth
+
+        let client;
+        try {
+            client = await connectMongo();
+
+            console.log('DB connected');
+        } catch (error) {
+            console.log('error : ', error);
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = {
+            nickname: nickname,
+            phone_number: phone_number,
+            email: email,
+            password: hashedPassword,
+            messages: [],
+        };
+
+        const user = new User(newUser);
+        console.log(user);
+
+        await user.save();
+
         return {
             user: { nickname: nickname, email: email },
             success: true,
         };
     }
-
-    return {
-        success: false,
-    };
 }
 
 export async function loginUser(
