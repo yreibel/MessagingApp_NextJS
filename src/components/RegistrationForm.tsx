@@ -35,6 +35,7 @@ export function RegistrationForm() {
         formState: { isValid, errors },
         handleSubmit,
         setFocus,
+        reset,
     } = useForm<FormValues>({ resolver: zodResolver(schema), mode: 'all' });
 
     const [formState, formAction] = useFormState(registerUser, {
@@ -43,6 +44,10 @@ export function RegistrationForm() {
     });
 
     useEffect(() => {
+        // Reset form to default values
+        reset();
+
+        // Async function to execute sign in function
         const executeSignIn = async () => {
             const credentials = {
                 email: formState.user?.email,
