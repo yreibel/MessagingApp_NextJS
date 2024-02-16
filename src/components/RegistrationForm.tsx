@@ -40,10 +40,6 @@ export function RegistrationForm() {
         user: { nickname: '', email: '' },
     });
 
-    /*const onBlur = (data: FormValues) => {
-        console.log(data);
-    };*/
-
     return (
         <form action={formAction}>
             <RegistrationFormContent

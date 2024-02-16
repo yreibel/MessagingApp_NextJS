@@ -11,6 +11,8 @@ import { connectMongo } from '@/utils/connectMongo';
 
 import User from '@/models/UserModel';
 
+import { signIn } from 'next-auth/react';
+
 export type FormState = {
     user?: DisplayableUser | null;
     success: boolean;
@@ -105,11 +107,12 @@ export async function registerUser(
     }
 }
 
-export async function loginUser(
+/*export async function loginUser(
     prevState: FormStateLogin,
     formData: FormData,
 ): Promise<FormStateLogin> {
     console.log(formData);
+    console.log('LOGIN USER SERVER ACTION');
 
     const user = await decodeForm(formData, loginFormSchema);
 
@@ -117,10 +120,9 @@ export async function loginUser(
 
     const { email, password } = parsedUser;
 
-    console.log(email);
     if (email !== null && password !== null) {
         return {
-            user: { email: email },
+            user: { email: email, password: password },
             success: true,
         };
     }
@@ -129,3 +131,4 @@ export async function loginUser(
         success: false,
     };
 }
+*/

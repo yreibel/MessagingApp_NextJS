@@ -1,6 +1,14 @@
 import { Schema, model, models, Types } from 'mongoose';
 
-interface IUser {
+export interface IUser {
+    nickname: String;
+    phone_number: string;
+    email: string;
+    password: string;
+    messages: Types.ObjectId[];
+}
+
+export interface IUserD extends Document {
     nickname: String;
     phone_number: string;
     email: string;

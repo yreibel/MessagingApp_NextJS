@@ -5,4 +5,5 @@ export type DisplayableUser = {
 
 export type DisplayableUserLogin = {
     email: string;
+    password: string;
 };
