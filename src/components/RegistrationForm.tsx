@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 
 import Link from 'next/link';
 
-import React, { FormEvent } from 'react';
+import React, { FormEvent, useEffect } from 'react';
 
 import { useForm, FieldErrors, UseFormRegister } from 'react-hook-form';
 
@@ -20,10 +20,12 @@ import { Loader2 } from 'lucide-react';
 
 //export type SubmitEvent = FormEvent<HTMLFormElement>;
 
-import { FormState } from '@/utils/_server_actions';
+import { FormStateRegister } from '@/utils/_server_actions';
 import { registerUser } from '@/utils/_server_actions';
 
 import { registrationFormSchema as schema } from '@/utils/_validation';
+
+import { signIn } from 'next-auth/react';
 
 type FormValues = z.infer<typeof schema>;
 
@@ -37,8 +39,32 @@ export function RegistrationForm() {
 
     const [formState, formAction] = useFormState(registerUser, {
         success: false,
-        user: { nickname: '', email: '' },
+        user: { nickname: '', email: '', password: '' },
     });
+
+    useEffect(() => {
+        const executeSignIn = async () => {
+            const credentials = {
+                email: formState.user?.email,
+                password: formState.user?.password,
+                redirect: false,
+            };
+
+            console.log(credentials);
+
+            const res = await signIn('credentials', credentials);
+
+            if (res?.error) {
+                console.log(res.error);
+            }
+
+            console.log(res);
+        };
+
+        if (formState.success) {
+            executeSignIn();
+        }
+    }, [formState.success, formState.user]);
 
     return (
         <form action={formAction}>
@@ -61,7 +87,7 @@ export function RegistrationFormContent({
     register: UseFormRegister<FormValues>;
     isValid: boolean;
     errors: FieldErrors<FormValues>;
-    formState: FormState;
+    formState: FormStateRegister;
 }) {
     const { pending } = useFormStatus();
 

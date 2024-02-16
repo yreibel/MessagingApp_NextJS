@@ -3,7 +3,7 @@
 import { loginFormSchema, registrationFormSchema } from '@/utils/_validation';
 import { decodeForm } from '@/lib/utils';
 
-import { DisplayableUser, DisplayableUserLogin } from '@/utils/types';
+import { DisplayableUserRegister, DisplayableUserLogin } from '@/utils/types';
 
 import bcrypt from 'bcrypt';
 
@@ -13,8 +13,8 @@ import User from '@/models/UserModel';
 
 import { signIn } from 'next-auth/react';
 
-export type FormState = {
-    user?: DisplayableUser | null;
+export type FormStateRegister = {
+    user?: DisplayableUserRegister | null;
     success: boolean;
 };
 
@@ -45,9 +45,9 @@ export type FormStateLogin = {
 }*/
 
 export async function registerUser(
-    prevState: FormState,
+    prevState: FormStateRegister,
     formData: FormData,
-): Promise<FormState> {
+): Promise<FormStateRegister> {
     console.log(formData);
 
     const user = await decodeForm(formData, registrationFormSchema);
@@ -98,10 +98,16 @@ export async function registerUser(
         const user = new User(newUser);
         console.log(user);
 
-        await user.save();
+        const res = await user.save();
+
+        if (res.error) {
+            return {
+                success: false,
+            };
+        }
 
         return {
-            user: { nickname: nickname, email: email },
+            user: { nickname: nickname, email: email, password: password },
             success: true,
         };
     }
