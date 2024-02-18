@@ -12,6 +12,7 @@ import { connectMongo } from '@/utils/connectMongo';
 import User from '@/models/UserModel';
 
 import { signIn } from 'next-auth/react';
+import { checkIfEmailExists } from './db_functions';
 
 export type FormStateRegister = {
     user?: DisplayableUserRegister | null;
@@ -23,27 +24,12 @@ export type FormStateLogin = {
     success: boolean;
 };
 
-/*export async function returnMessage(
-    prevState: FormState,
-    formData: FormData,
-): Promise<FormState> {
-    console.log(formData);
-
-    const { email } = await decodeForm(formData, registrationFormSchema);
-
-    console.log(email);
-    if (email !== null) {
-        return {
-            message: email,
-            success: true,
-        };
-    }
-
-    return {
-        success: false,
-    };
-}*/
-
+/**
+ * Server action to register the user
+ * @param prevState
+ * @param formData
+ * @returns
+ */
 export async function registerUser(
     prevState: FormStateRegister,
     formData: FormData,
@@ -111,6 +97,16 @@ export async function registerUser(
             success: true,
         };
     }
+}
+
+/**
+ * Server action to proceed to email verification in the db (is there an existing mail already)
+ * @param email
+ * @returns
+ */
+export async function verifEmail(email: string) {
+    const exists = await checkIfEmailExists(email);
+    return exists;
 }
 
 /*export async function loginUser(
