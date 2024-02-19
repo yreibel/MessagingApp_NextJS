@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -9,8 +11,22 @@ import { LoginForm } from '@/components/LoginForm';
 
 import Link from 'next/link';
 
-export default function ChatMessage() {
+type ChatParams = {
+    isUser: boolean;
+};
+
+export default function ChatMessage({ isUser }: ChatParams) {
     return (
-        <div className="w-fit p-5 bg-slate-100 rounded-md">Hello it's me</div>
+        <>
+            {isUser ? (
+                <div className="w-fit p-5 bg-slate-100 rounded-md self-end">
+                    Hello it's me
+                </div>
+            ) : (
+                <div className="w-fit p-5 bg-slate-100 rounded-md self-start">
+                    Hello it's me
+                </div>
+            )}
+        </>
     );
 }
