@@ -13,6 +13,8 @@ import React, {
     ChangeEvent,
     useRef,
     ChangeEventHandler,
+    FocusEventHandler,
+    FocusEvent,
 } from 'react';
 
 import { useState } from 'react';
@@ -81,6 +83,8 @@ export function RegistrationForm() {
         setFocus,
         reset,
         getValues,
+        trigger,
+        clearErrors,
     } = useForm<FormValues>({ resolver: zodResolver(schema), mode: 'all' });
 
     const [formState, formAction] = useFormState(registerUser, {
@@ -88,17 +92,21 @@ export function RegistrationForm() {
         user: { nickname: '', email: '', password: '' },
     });
 
-    const [email, setEmail] = useState<string>('');
-
     const [emailExisting, setEmailExisting] = useState<boolean>(true);
 
-    /**
-     * onChange handler
-     * @param e
-     */
-    const handleOnChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log('bonjour', e.target.value);
-        setEmail(e.target.value);
+    const handleOnFocusOutEmail = (e: FocusEvent<HTMLInputElement>) => {
+        console.log('losing focus :', e.target.value);
+
+        const checkEmailField = async () => {
+            const emailExists = await verifEmail(e.target.value);
+            console.log('email:', emailExists);
+
+            setEmailExisting(emailExists);
+        };
+
+        //if (isValid) {
+        checkEmailField();
+        //}
     };
 
     /**
@@ -133,23 +141,6 @@ export function RegistrationForm() {
         }
     }, [formState.success, formState.user]);
 
-    /**
-     * Check if email is unique (already exists in db)
-     */
-    useEffect(() => {
-        const checkEmailField = async () => {
-            const emailExists = await verifEmail(email);
-            console.log('email:', emailExists);
-            //setEmailExisting(emailExists);
-            setEmailExisting(emailExists);
-            //return emailExists;
-        };
-
-        if (isValid) {
-            checkEmailField();
-        }
-    }, [email]);
-
     return (
         <form action={formAction}>
             <RegistrationFormContent
@@ -157,8 +148,8 @@ export function RegistrationForm() {
                 isValid={isValid}
                 errors={errors}
                 formState={formState}
-                handleOnChangeEmail={handleOnChangeEmail}
                 emailExisting={emailExisting}
+                handleOnFocusOutEmail={handleOnFocusOutEmail}
             ></RegistrationFormContent>
         </form>
     );
@@ -169,15 +160,15 @@ export function RegistrationFormContent({
     isValid,
     errors,
     formState,
-    handleOnChangeEmail,
     emailExisting,
+    handleOnFocusOutEmail,
 }: {
     register: UseFormRegister<FormValues>;
     isValid: boolean;
     errors: FieldErrors<FormValues>;
     formState: FormStateRegister;
-    handleOnChangeEmail: ChangeEventHandler<HTMLInputElement>;
     emailExisting: boolean;
+    handleOnFocusOutEmail: FocusEventHandler<HTMLInputElement>;
 }) {
     const { pending } = useFormStatus();
 
@@ -187,7 +178,7 @@ export function RegistrationFormContent({
                 <div className="text-sm">Nickname</div>
                 <Input
                     {...register('nickname')}
-                    type="nickname"
+                    name="nickname"
                     placeholder="Nickname"
                 />
                 {errors.nickname && (
@@ -200,9 +191,10 @@ export function RegistrationFormContent({
 
                 <Input
                     {...register('email')}
+                    name="email"
                     type="email"
                     placeholder="Email"
-                    onChange={handleOnChangeEmail}
+                    onBlur={handleOnFocusOutEmail}
                 />
 
                 {errors.email && (
@@ -211,7 +203,7 @@ export function RegistrationFormContent({
             </div>
 
             <div className="row-start-2 col-start-2 mt-8">
-                {emailExisting ? (
+                {emailExisting || errors.email !== undefined ? (
                     <XCircle color="#eb4414" />
                 ) : (
                     <CheckCircle color="#54a800" />
@@ -222,6 +214,7 @@ export function RegistrationFormContent({
                 <div className="text-sm">Phone number</div>
                 <Input
                     {...register('phone_number')}
+                    name="phone_number"
                     type="tel"
                     placeholder="Phone number"
                 />
@@ -234,6 +227,7 @@ export function RegistrationFormContent({
                 <div className="text-sm">Password</div>
                 <Input
                     {...register('password')}
+                    name="password"
                     type="password"
                     placeholder="Password"
                 />
@@ -243,12 +237,23 @@ export function RegistrationFormContent({
                 )}
             </div>
             <div className="row-start-5">
-                {!isValid ||
-                    (emailExisting && (
-                        <Button type="submit" disabled={true}>
-                            Register
-                        </Button>
-                    ))}
+                {!isValid && emailExisting && (
+                    <Button type="submit" disabled={true}>
+                        Register
+                    </Button>
+                )}
+
+                {!isValid && !emailExisting && (
+                    <Button type="submit" disabled={true}>
+                        Register
+                    </Button>
+                )}
+
+                {isValid && emailExisting && (
+                    <Button type="submit" disabled={true}>
+                        Register
+                    </Button>
+                )}
 
                 {isValid && !pending && !emailExisting && (
                     <Button type="submit">Register</Button>
