@@ -13,18 +13,19 @@ import Link from 'next/link';
 
 type ChatParams = {
     isUser: boolean;
+    message: string;
 };
 
-export default function ChatMessage({ isUser }: ChatParams) {
+export default function ChatMessage({ isUser, message }: ChatParams) {
     return (
         <>
             {isUser ? (
                 <div className="w-fit p-5 bg-slate-100 rounded-md self-end">
-                    Hello it's me
+                    {message}
                 </div>
             ) : (
                 <div className="w-fit p-5 bg-slate-100 rounded-md self-start">
-                    Hello it's me
+                    {message}
                 </div>
             )}
         </>
