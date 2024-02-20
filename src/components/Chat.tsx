@@ -26,12 +26,17 @@ import SearchBarChat from '@/components/SearchBarChat';
 import { io } from 'socket.io-client';
 const socket = io('http://localhost:3001');
 
+type Message = {
+    message: string;
+    socketid: string;
+};
+
 export default function Chat() {
-    const [messages, setMessages] = useState<string[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
 
     useEffect(() => {
         // Listen for incoming messages
-        const messageListener = (message: string) => {
+        const messageListener = (message: Message) => {
             setMessages((prevMessages) => [...prevMessages, message]);
         };
 
@@ -48,8 +53,8 @@ export default function Chat() {
                 {messages.map((item, index) => (
                     <ChatMessage
                         key={index}
-                        isUser={true}
-                        message={item}
+                        isUser={item.socketid == socket.id}
+                        message={item.message}
                     ></ChatMessage>
                 ))}
             </div>

@@ -20,7 +20,10 @@ export default function SearchBarChat({ socket }: any) {
         e: MouseEvent<HTMLButtonElement>,
     ) => {
         console.log(e);
-        socket.emit('chat message', newMessage);
+        socket.emit('chat message', {
+            message: newMessage,
+            socketid: socket.id,
+        });
         setNewMessage('');
     };
 
@@ -38,6 +41,7 @@ export default function SearchBarChat({ socket }: any) {
             }}
         >
             <Input
+                value={newMessage}
                 onChange={onInputChange}
                 className="h-10 focus:ring-none"
             ></Input>
